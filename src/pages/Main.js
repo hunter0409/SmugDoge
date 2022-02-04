@@ -6,32 +6,83 @@ import photo1 from '../assets/images/photo1.jpg'
 import photo2 from '../assets/images/photo2.jpg'
 import { Link } from 'react-router-dom'
 import '../App.css'
+import { useWeb3React } from "@web3-react/core";
+import { Web3Provider } from "@ethersproject/providers";
 import Web3 from "web3"
 
+import AppContract from "../assets/abi.json";
+
 export default function Main() {
-    const [hunter, setHunter] = useState('')
+
+    const web3 = new Web3((window).web3.currentProvider);
+
+    const [accounts, setAccounts] = React.useState([]);
+    const [instance, setInstance] = React.useState(null);
+    const [count, setCount] = React.useState(1);
+
+    React.useEffect(() => {
+        const init = async () => {
+            const accounts = await web3.eth.getAccounts();
+
+            // Get the contract instance.
+            const networkId = await web3.eth.net.getId();
+
+            const instance = new web3.eth.Contract(
+                // @ts-ignore
+                AppContract.abi,
+                "0xF7E1B47E852031A986f192A607b916BE9A432837"
+            );
+
+            setAccounts(accounts);
+            setInstance(instance);
+        };
+        init();
+    }, []);
 
     const mint = async () => {
         window.ethereum.request({ method: 'eth_requestAccounts' });
-        const web3 = new Web3((window).web3.currentProvider);
-        const account = await web3.eth.getAccounts();
-        console.log("address", account[0]);
-        const balance = web3.eth.getBalance(account[0]);
-        console.log(balance);
+        // const account = await web3.eth.getAccounts();
+        // console.log("address", account[0]);
+        // const balance = web3.eth.getBalance(account[0]);
+        // console.log(balance);
+        try {
+            if (!instance) throw new Error(`No Ethereum Instance.`);
+
+            if (!accounts)
+                throw new Error(`No account selected. Try reauthenticating`);
+            const amount = (0.061 * (count)).toFixed(3);
+
+            const value = web3.utils.toWei(amount, "ether");
+
+            const gas = (count) => {
+                switch (true) {
+                    case Number(count) > 1 && Number(count) <= 3:
+                        return "250000";
+                    case Number(count) > 3 && Number(count) <= 6:
+                        return "450000";
+                    case Number(count) > 6 && Number(count) <= 9:
+                        return "600000";
+                    case Number(count) > 6 && Number(count) <= 9:
+                        return "600000";
+                    case Number(count) > 9 && Number(count) <= 12:
+                        return "750000";
+                    case Number(count) > 12 && Number(count) <= 15:
+                        return "850000";
+                    case Number(count) > 15:
+                        return "950000";
+                }
+            };
+
+            console.log("*********MINTING************", accounts[0]);
+            await instance.methods.mint(count).send({
+                from: accounts[0],
+                value,
+                gas: gas(count),
+            });
+        } catch (err) {
+            console.log(err);
+        }
     }
-
-    useEffect(() => {
-        return () => {
-
-        }
-    }, [])
-
-    useEffect(() => {
-
-        return () => {
-
-        }
-    }, [hunter])
 
     return (
         <div>
