@@ -17,19 +17,39 @@ contract SmugDoge is ERC721, Ownable {
     mapping(uint256 => string) tokenUrls;
 
     constructor() ERC721("SmugDoge", "SMD") {
-        setBaseURL("ipfs://");
+        setBaseURL("ipfs://QmTPLrtddDY41YeprFMrYAZuFt3ABqfCnx6vjvLfE1kiRu/");
     }
 
-    function mint(string memory metadataURI) external payable {
+    // function mint(string memory metadataURI) external payable {
+    //     require(
+    //         _tokenIds.current() < _maxSupply,
+    //         "Can not mint more than max supply"
+    //     );
+    //     require(msg.value >= 420 ether, "Insufficient payment");
+
+    //     _safeMint(msg.sender, _tokenIds.current());
+    //     // _setTokenURI(_tokenIds.current(), metadataURI);
+    //     _tokenIds.increment();
+    // }
+
+    function mint(uint256 count) external payable {
         require(
             _tokenIds.current() < _maxSupply,
             "Can not mint more than max supply"
         );
-        require(msg.value >= 420 ether, "Insufficient payment");
+        require(
+            count > 0 && count <= 12,
+            "You can mint between 1 and 12 at once"
+        );
+        require(msg.value >= count * 0.069 ether, "Insufficient payment");
+        for (uint256 i = 0; i < count; i++) {
+            _tokenIds.increment();
+            _mint(msg.sender, _tokenIds.current());
+        }
 
-        _safeMint(msg.sender, _tokenIds.current());
-        // _setTokenURI(_tokenIds.current(), metadataURI);
-        _tokenIds.increment();
+        bool success = false;
+        (success, ) = owner().call{value: msg.value}("");
+        require(success, "Failed to send to owner");
     }
 
     function getTokenURL(uint256 tokenId) public view returns (string memory) {

@@ -2,43 +2,98 @@ import React, { useEffect, useState } from 'react'
 import Footer from '../layouts/Footer'
 import memes from '../assets/images/memes.png'
 import flag from '../assets/images/flag.jpg'
-import photo1 from '../assets/images/photo1.jpg'
-import photo2 from '../assets/images/photo2.jpg'
+import photo1 from '../assets/images/1.png'
+import photo2 from '../assets/images/2.png'
+import photo3 from '../assets/images/3.png'
+import photo4 from '../assets/images/4.png'
+import photo5 from '../assets/images/5.png'
+import photo6 from '../assets/images/6.png'
 import { Link } from 'react-router-dom'
 import '../App.css'
+import { useWeb3React } from "@web3-react/core";
+import { Web3Provider } from "@ethersproject/providers";
 import Web3 from "web3"
 
+import AppContract from "../assets/abi.json";
+
 export default function Main() {
-    const [hunter, setHunter] = useState('')
+
+    const web3 = new Web3((window).web3.currentProvider);
+
+    const [accounts, setAccounts] = React.useState([]);
+    const [instance, setInstance] = React.useState(null);
+    const [count, setCount] = React.useState(1);
+
+    React.useEffect(() => {
+        const init = async () => {
+            const accounts = await web3.eth.getAccounts();
+
+            // Get the contract instance.
+            const networkId = await web3.eth.net.getId();
+
+            const instance = new web3.eth.Contract(
+                // @ts-ignore
+                AppContract.abi,
+                "0xF7E1B47E852031A986f192A607b916BE9A432837"
+            );
+
+            setAccounts(accounts);
+            setInstance(instance);
+        };
+        init();
+    }, []);
 
     const mint = async () => {
         window.ethereum.request({ method: 'eth_requestAccounts' });
-        const web3 = new Web3((window).web3.currentProvider);
-        const account = await web3.eth.getAccounts();
-        console.log("address", account[0]);
-        const balance = web3.eth.getBalance(account[0]);
-        console.log(balance);
+        // const account = await web3.eth.getAccounts();
+        // console.log("address", account[0]);
+        // const balance = web3.eth.getBalance(account[0]);
+        // console.log(balance);
+        try {
+            if (!instance) throw new Error(`No Ethereum Instance.`);
+
+            if (!accounts)
+                throw new Error(`No account selected. Try reauthenticating`);
+            const amount = (0.061 * (count)).toFixed(3);
+
+            const value = web3.utils.toWei(amount, "ether");
+
+            const gas = (count) => {
+                switch (true) {
+                    case Number(count) > 1 && Number(count) <= 3:
+                        return "250000";
+                    case Number(count) > 3 && Number(count) <= 6:
+                        return "450000";
+                    case Number(count) > 6 && Number(count) <= 9:
+                        return "600000";
+                    case Number(count) > 6 && Number(count) <= 9:
+                        return "600000";
+                    case Number(count) > 9 && Number(count) <= 12:
+                        return "750000";
+                    case Number(count) > 12 && Number(count) <= 15:
+                        return "850000";
+                    case Number(count) > 15:
+                        return "950000";
+                }
+            };
+
+            console.log("*********MINTING************", accounts[0]);
+            await instance.methods.mint(count).send({
+                from: accounts[0],
+                value,
+                gas: gas(count),
+            });
+        } catch (err) {
+            console.log(err);
+        }
     }
-
-    useEffect(() => {
-        return () => {
-
-        }
-    }, [])
-
-    useEffect(() => {
-
-        return () => {
-
-        }
-    }, [hunter])
 
     return (
         <div>
             <section className='grid grid-cols-1 lg:grid-cols-3 gap-4 border-b-2 border-midnight'>
-                <div className='meme lg:order-last items-center mt-10 mb-5 lg:mb-0 lg:col-start-3 lg:col-end-4'>
-                    <img src={memes} className="w-full relative cursor-pointer" />
-                    <div className='kk hidden bg-red text-white absolute text-xl font-bold -mt-20 px-3 py-3 ml-10'>Match free toaster in your area.</div>
+                <div className='meme lg:order-last items-center mt-20 mb-5 lg:mb-0 lg:col-start-3 lg:col-end-4'>
+                    <img src={memes} className="w-full relative cursor-pointer mt-20" />
+                    <div className='kk hidden bg-red text-white absolute text-xl font-bold -mt-20 px-3 py-3 ml-10'><p>Match free toaster in your area.</p></div>
                 </div>
                 <div className='text-center lg:text-left flex items-center mb-5 lg:mb-0 lg:col-start-1 lg:col-end-3'>
                     <div className='mx-auto px-10 py-10'>
@@ -72,7 +127,7 @@ export default function Main() {
                                 </div>
                             </a>
                             <a href='/mintsection3'>
-                                <img src={photo1} className='border-2 border-gray' />
+                                <img src={photo3} className='border-2 border-gray' />
                                 <div class="lg:pl-2 text-white font-bold flex">
                                     <span>1.1M views</span>&nbsp;
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -85,7 +140,7 @@ export default function Main() {
                         </div>
                         <div className='flex gap-3'>
                             <a href='/mintsection4'>
-                                <img src={photo2} className='border-2 border-gray' />
+                                <img src={photo4} className='border-2 border-gray' />
                                 <div class="lg:pl-2 text-white font-bold flex">
                                     <span>1M views</span>&nbsp;
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -96,7 +151,7 @@ export default function Main() {
                                 </div>
                             </a>
                             <a href='/mintsection5'>
-                                <img src={photo1} className='border-2 border-gray' />
+                                <img src={photo5} className='border-2 border-gray' />
                                 <div class="lg:pl-2 text-white font-bold flex">
                                     <span>1.3M views</span>&nbsp;
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,7 +162,7 @@ export default function Main() {
                                 </div>
                             </a>
                             <a href='/mintsection6'>
-                                <img src={photo2} className='border-2 border-gray' />
+                                <img src={photo6} className='border-2 border-gray' />
                                 <div class="lg:pl-2 text-white font-bold flex">
                                     <span>1.4M views</span>&nbsp;
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -172,19 +227,19 @@ export default function Main() {
                 <div class="container grid grid-cols-3 gap-8 mb-10 mt-10">
                     <div>
                         <div className="border-2 border-gray">
-                            <img src={photo2} alt slot="svg" />
+                            <img src={photo1} alt slot="svg" />
                         </div>
                         <p className="text-center text-2xl text-white mt-4">Project Manager </p>
                     </div>
                     <div>
                         <div className="border-2 border-gray">
-                            <img src={photo1} alt slot="svg" />
+                            <img src={photo2} alt slot="svg" />
                         </div>
                         <p className="text-center text-2xl text-white mt-4">Developer </p>
                     </div>
                     <div>
                         <div className="border-2 border-gray">
-                            <img src={photo2} alt slot="svg" />
+                            <img src={photo3} alt slot="svg" />
                         </div>
                         <p className="text-center text-2xl text-white mt-4">Artist </p>
                     </div>
