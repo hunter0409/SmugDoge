@@ -67,7 +67,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <div className="border-2 border-gray">
-                  <img src={photo10} alt slot="svg" />
+                  <img src={photo2} alt slot="svg" />
                 </div>
                 <p className='mt-5 text-center'>690 ONE</p>
               </div>

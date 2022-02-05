@@ -21,6 +21,7 @@ export default function Main() {
     const web3 = new Web3((window).web3.currentProvider);
 
     const [accounts, setAccounts] = React.useState([]);
+    const [networkId, setNetworkId] = React.useState(0);
     const [instance, setInstance] = React.useState(null);
     const [count, setCount] = React.useState(1);
 
@@ -34,57 +35,37 @@ export default function Main() {
             const instance = new web3.eth.Contract(
                 // @ts-ignore
                 AppContract.abi,
-                "0xF7E1B47E852031A986f192A607b916BE9A432837"
+                "0x75bFeB6e624146989DbDFF6d769E0Ce3d1A7EAeE"
             );
 
             setAccounts(accounts);
             setInstance(instance);
+            setNetworkId(networkId);
         };
         init();
     }, []);
 
     const mint = async () => {
         window.ethereum.request({ method: 'eth_requestAccounts' });
-        // const account = await web3.eth.getAccounts();
-        // console.log("address", account[0]);
-        // const balance = web3.eth.getBalance(account[0]);
-        // console.log(balance);
-        try {
-            if (!instance) throw new Error(`No Ethereum Instance.`);
+        if (networkId == 1666700000) {
+            try {
+                if (!instance) throw new Error(`No Ethereum Instance.`);
 
-            if (!accounts)
-                throw new Error(`No account selected. Try reauthenticating`);
-            const amount = (0.061 * (count)).toFixed(3);
+                if (!accounts)
+                    throw new Error(`No account selected. Try reauthenticating`);
+                const amount = "420";
 
-            const value = web3.utils.toWei(amount, "ether");
-
-            const gas = (count) => {
-                switch (true) {
-                    case Number(count) > 1 && Number(count) <= 3:
-                        return "250000";
-                    case Number(count) > 3 && Number(count) <= 6:
-                        return "450000";
-                    case Number(count) > 6 && Number(count) <= 9:
-                        return "600000";
-                    case Number(count) > 6 && Number(count) <= 9:
-                        return "600000";
-                    case Number(count) > 9 && Number(count) <= 12:
-                        return "750000";
-                    case Number(count) > 12 && Number(count) <= 15:
-                        return "850000";
-                    case Number(count) > 15:
-                        return "950000";
-                }
-            };
-
-            console.log("*********MINTING************", accounts[0]);
-            await instance.methods.mint(count).send({
-                from: accounts[0],
-                value,
-                gas: gas(count),
-            });
-        } catch (err) {
-            console.log(err);
+                const value = web3.utils.toWei(amount, "ether");
+                await instance.methods.mintNFTs().send({
+                    from: accounts[0],
+                    value,
+                    gas: 250000,
+                });
+            } catch (err) {
+                console.log(err);
+            }
+        } else {
+            alert("Please change your network to harmony testnet");
         }
     }
 
@@ -93,7 +74,7 @@ export default function Main() {
             <section className='grid grid-cols-1 lg:grid-cols-3 gap-4 border-b-2 border-midnight'>
                 <div className='meme lg:order-last items-center mt-20 mb-5 lg:mb-0 lg:col-start-3 lg:col-end-4'>
                     <img src={memes} className="w-full relative cursor-pointer mt-20" />
-                    <div className='kk hidden bg-red text-white absolute text-xl font-bold -mt-20 px-3 py-3 ml-10'><p>Match free toaster in your area.</p></div>
+                    <div className='kk hidden bg-red text-white absolute text-xl font-bold -mt-20 px-3 py-3 ml-10'>Match free toaster in your area.</div>
                 </div>
                 <div className='text-center lg:text-left flex items-center mb-5 lg:mb-0 lg:col-start-1 lg:col-end-3'>
                     <div className='mx-auto px-10 py-10'>
@@ -115,7 +96,7 @@ export default function Main() {
                                     <span>91%</span>
                                 </div>
                             </a>
-                            <a href='/mintsection2'>
+                            <a href='/mintsection'>
                                 <img src={photo2} className='border-2 border-gray' />
                                 <div class="lg:pl-2 text-white font-bold flex">
                                     <span>1.5M views</span>&nbsp;
@@ -126,7 +107,7 @@ export default function Main() {
                                     <span>96%</span>
                                 </div>
                             </a>
-                            <a href='/mintsection3'>
+                            <a href='/mintsection'>
                                 <img src={photo3} className='border-2 border-gray' />
                                 <div class="lg:pl-2 text-white font-bold flex">
                                     <span>1.1M views</span>&nbsp;
@@ -139,7 +120,7 @@ export default function Main() {
                             </a>
                         </div>
                         <div className='flex gap-3'>
-                            <a href='/mintsection4'>
+                            <a href='/mintsection'>
                                 <img src={photo4} className='border-2 border-gray' />
                                 <div class="lg:pl-2 text-white font-bold flex">
                                     <span>1M views</span>&nbsp;
@@ -150,7 +131,7 @@ export default function Main() {
                                     <span>89%</span>
                                 </div>
                             </a>
-                            <a href='/mintsection5'>
+                            <a href='/mintsection'>
                                 <img src={photo5} className='border-2 border-gray' />
                                 <div class="lg:pl-2 text-white font-bold flex">
                                     <span>1.3M views</span>&nbsp;
@@ -161,7 +142,7 @@ export default function Main() {
                                     <span>93%</span>
                                 </div>
                             </a>
-                            <a href='/mintsection6'>
+                            <a href='/mintsection'>
                                 <img src={photo6} className='border-2 border-gray' />
                                 <div class="lg:pl-2 text-white font-bold flex">
                                     <span>1.4M views</span>&nbsp;
